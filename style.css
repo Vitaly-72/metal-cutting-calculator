@@ -1,0 +1,120 @@
+body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .input-section, .output-section {
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 5px;
+            flex: 1;
+            min-width: 300px;
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-bottom: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .length-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .length-option {
+            display: flex;
+            align-items: center;
+        }
+        .length-inputs {
+            margin-top: 10px;
+        }
+        .length-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .length-input input {
+            flex: 1;
+        }
+        .result-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .result-header {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .result-details {
+            margin-left: 20px;
+        }
+        .delete-btn {
+            background-color: #f44336;
+            margin-top: 5px;
+        }
+        .save-btn {
+            background-color: #2196F3;
+        }
+		 /* Добавляем стили для печати */
+        
+		
+		@media print {
+    body * {
+        display: none;
+    }
+    .print-section, .print-section * {
+        display: block !important;
+        visibility: visible !important;
+    }
+    .print-section {
+        position: static;
+        width: 100%;
+        padding: 20px;
+        margin: 0;
+        box-shadow: none;
+        background: white;
+        page-break-after: auto;
+    }
+}
+
+.print-section {
+    display: none;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin: 20px auto;
+    max-width: 800px;
+}

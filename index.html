@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор резки металлопроката</title>
+    
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Калькулятор резки металлопроката</h1>
+    
+    <div class="container">
+        <div class="input-section">
+            <h2>Ввод данных</h2>
+            
+            <div class="form-group">
+                <label for="productName">Название товара:</label>
+                <input type="text" id="productName" placeholder="Например: Уголок 50×50">
+            </div>
+            
+            <div class="form-group">
+                <label>Длины изделий (выберите несколько):</label>
+                <div class="length-options" id="lengthOptions">
+                    <!-- Опции будут добавлены через JS -->
+                </div>
+                <div>
+                    <input type="text" id="customLength" placeholder="Добавить свою длину (м)">
+                    <button onclick="addCustomLength()">Добавить</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Требуемые размеры и количество:</label>
+                <div class="length-inputs" id="lengthInputs">
+                    <div class="length-input">
+                        <input type="number" step="0.01" class="required-length" placeholder="Длина (м)">
+                        <input type="number" class="required-quantity" placeholder="Количество">
+                        <button onclick="removeLengthInput(this)">×</button>
+                    </div>
+                </div>
+                <button onclick="addLengthInput()">Добавить размер</button>
+            </div>
+            
+            <button onclick="calculate()">Рассчитать</button>
+        </div>
+        
+        <div class="output-section">
+            <h2>Результаты</h2>
+            <div id="results"></div>
+            <button class="save-btn no-print" onclick="printResults()" id="printBtn" disabled>Печать</button>
+        </div>
+    </div>
+<!-- Скрытый контейнер для печати -->
+     <div id="printSection" class="print-section"></div>
+ <script src="script.js"></script>
+</body>
+</html>
