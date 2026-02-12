@@ -1,6 +1,6 @@
 const AUTHOR = "Синишин Виталий (vitas-0071@yandex.ru)";
 const LICENSE = "Проприетарная лицензия. Использование только с разрешения автора.";
-// Инициализация стандартных длин
+ // Инициализация стандартных длин
         const defaultLengths = [5.85, 6, 11.7, 12];
         let selectedLengths = [];
         let results = [];
@@ -80,6 +80,39 @@ const LICENSE = "Проприетарная лицензия. Использов
                 const inputs = button.parentElement.querySelectorAll('input');
                 inputs.forEach(input => input.value = '');
             }
+        }
+        
+        // Функция подсчета количества резов и отрезков
+        function calculateSummary(plans, requiredPieces) {
+            // Считаем общее количество резов
+            let totalCuts = 0;
+            plans.forEach(plan => {
+                totalCuts += plan.cutsCount * plan.count;
+            });
+            
+            // Считаем количество полученных отрезков каждого размера
+            const cutsSummary = {};
+            plans.forEach(plan => {
+                plan.cuts.forEach(cutLength => {
+                    if (!cutsSummary[cutLength]) {
+                        cutsSummary[cutLength] = 0;
+                    }
+                    cutsSummary[cutLength] += plan.count;
+                });
+            });
+            
+            // Считаем остатки
+            const remainsSummary = {};
+            plans.forEach(plan => {
+                if (plan.remaining > 0.01) {
+                    if (!remainsSummary[plan.remaining]) {
+                        remainsSummary[plan.remaining] = 0;
+                    }
+                    remainsSummary[plan.remaining] += plan.count;
+                }
+            });
+            
+            return { totalCuts, cutsSummary, remainsSummary };
         }
         
         // Основная функция расчета
@@ -162,7 +195,7 @@ const LICENSE = "Проприетарная лицензия. Использов
                     stockLength: bestFit,
                     cuts: [piecesToCut[0]],
                     remaining: bestFit - piecesToCut[0],
-                    cutsCount: 1 // Добавляем счетчик резов
+                    cutsCount: 1
                 };
                 
                 piecesToCut.shift();
@@ -172,9 +205,9 @@ const LICENSE = "Проприетарная лицензия. Использов
                     if (piecesToCut[i] <= newPlan.remaining) {
                         newPlan.cuts.push(piecesToCut[i]);
                         newPlan.remaining -= piecesToCut[i];
-                        newPlan.cutsCount++; // Увеличиваем счетчик резов
+                        newPlan.cutsCount++;
                         piecesToCut.splice(i, 1);
-                        i--; // Уменьшаем индекс, так как массив изменился
+                        i--;
                     }
                 }
                 
@@ -190,17 +223,23 @@ const LICENSE = "Проприетарная лицензия. Использов
                         stockLength: plan.stockLength,
                         cuts: plan.cuts,
                         remaining: plan.remaining,
-                        cutsCount: plan.cutsCount, // Сохраняем количество резов
+                        cutsCount: plan.cutsCount,
                         count: 0
                     };
                 }
                 groupedPlans[key].count++;
             });
             
+            // Получаем сводные данные
+            const plansArray = Object.values(groupedPlans);
+            const summary = calculateSummary(plansArray, requiredPieces);
+            
             // Сохраняем результат
             const result = {
                 productName,
-                plans: Object.values(groupedPlans)
+                plans: plansArray,
+                summary: summary,
+                requiredPieces: requiredPieces
             };
             
             results.push(result);
@@ -237,10 +276,34 @@ const LICENSE = "Проприетарная лицензия. Использов
                     `;
                 });
                 
-                html += `
-                    </div>
-                    <button class="delete-btn" onclick="deleteResult(${resultIndex})">Удалить</button>
-                `;
+                // Добавляем сводку
+                html += `<div class="result-summary">`;
+                html += `<strong>ИТОГО:</strong><div class="cuts-list">`;
+                
+                // Сортируем отрезки по длине
+                const sortedCuts = Object.keys(result.summary.cutsSummary)
+                    .sort((a, b) => parseFloat(b) - parseFloat(a));
+                
+                sortedCuts.forEach(length => {
+                    html += `<div>по ${parseFloat(length).toFixed(2)}м - ${result.summary.cutsSummary[length]} шт.</div>`;
+                });
+                
+                // Добавляем остатки
+                if (Object.keys(result.summary.remainsSummary).length > 0) {
+                    const sortedRemains = Object.keys(result.summary.remainsSummary)
+                        .sort((a, b) => parseFloat(b) - parseFloat(a));
+                    
+                    sortedRemains.forEach(length => {
+                        html += `<div>по ${parseFloat(length).toFixed(2)}м - ${result.summary.remainsSummary[length]} шт. (остатки)</div>`;
+                    });
+                }
+                
+                html += `</div>`;
+                html += `<div class="total-cuts">Общее количество резов "${result.productName}": ${result.summary.totalCuts} резов</div>`;
+                html += `</div>`;
+                html += `</div>`;
+                
+                html += `<button class="delete-btn" onclick="deleteResult(${resultIndex})">Удалить</button>`;
                 
                 resultDiv.innerHTML = html;
                 container.appendChild(resultDiv);
@@ -294,6 +357,34 @@ const LICENSE = "Проприетарная лицензия. Использов
                     item.appendChild(planDiv);
                 });
                 
+                // Добавляем сводку в печатную версию
+                const summaryDiv = document.createElement('div');
+                summaryDiv.className = 'print-summary';
+                
+                let summaryHtml = `<strong>ИТОГО:</strong><div class="print-cuts-list">`;
+                
+                const sortedCuts = Object.keys(result.summary.cutsSummary)
+                    .sort((a, b) => parseFloat(b) - parseFloat(a));
+                
+                sortedCuts.forEach(length => {
+                    summaryHtml += `<div>по ${parseFloat(length).toFixed(2)}м - ${result.summary.cutsSummary[length]} шт.</div>`;
+                });
+                
+                if (Object.keys(result.summary.remainsSummary).length > 0) {
+                    const sortedRemains = Object.keys(result.summary.remainsSummary)
+                        .sort((a, b) => parseFloat(b) - parseFloat(a));
+                    
+                    sortedRemains.forEach(length => {
+                        summaryHtml += `<div>по ${parseFloat(length).toFixed(2)}м - ${result.summary.remainsSummary[length]} шт. (остатки)</div>`;
+                    });
+                }
+                
+                summaryHtml += `</div>`;
+                summaryHtml += `<div class="print-total-cuts">Общее количество резов "${result.productName}": ${result.summary.totalCuts} резов</div>`;
+                
+                summaryDiv.innerHTML = summaryHtml;
+                item.appendChild(summaryDiv);
+                
                 printSection.appendChild(item);
             });
             
@@ -318,5 +409,7 @@ const LICENSE = "Проприетарная лицензия. Использов
             } else {
                 return '';
             }
+        }
 
         }
+
